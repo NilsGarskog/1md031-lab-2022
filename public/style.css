@@ -1,1 +1,75 @@
+@import 'https://fonts.googleapis.com/css?family=specimen|Questrial';
+
+
+body{ /* Sätta allmänna regler för all text */
+    font-family: "Questrial",specimen;
+    text-align: center;
+}
+
+#mount {
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+#Customer_information {
+    background-color: black;
+    color: white;
+    margin: 10px 25px;
+    border: 10px solid rgba(255, 255, 255, 0.822);
+    border-radius: 25px;
+    border-radius: 10px;
+    border-style: inset ;
+
+}
+
+#cameras{
+    margin: 10px 25px;
+    border: 10px solid rgba(21, 82, 21, 0.822);
+    border-radius: 25px;
+    border-style: outset ;
+}
+
+li{
+    text-align: left;
+}
+
+button:hover {
+    background-color: green;
+    cursor:pointer;
+    transition: background-color 0.3s;
+ }
+
+ button:active{
+    opacity: 0.7;
+ }
+
+ BUTTON{
+    margin: 0px 25px;
+ }
+
+ div{
+    display: inline-block;
+ }
+
+#headlineIMG{
+    position: relative;
+    opacity: 0.7;
+    object-fit: cover;
+    height: 200px;
+    width:100%;
+}
+
+#Header{
+ text-align: center;
+ width: 100%;
+ position: absolute;
+ margin-top: -150px;
+ font-weight: bold;
+ font-size: 80px;
+
+}
+
+ 
+
+
 /*empty*/
