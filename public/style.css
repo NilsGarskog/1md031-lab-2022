@@ -43,20 +43,15 @@ button:hover {
     opacity: 0.7;
  }
 
- BUTTON{
-    margin: 0px 25px;
- }
-
- div{
-    display: inline-block;
- }
-
 #headlineIMG{
     position: relative;
     opacity: 0.7;
     object-fit: cover;
     height: 200px;
     width:100%;
+    filter: blur(3px);
+    -webkit-filter: blur(3px);
+  
 }
 
 #Header{
@@ -68,6 +63,13 @@ button:hover {
  font-size: 80px;
 
 }
+
+/*Grid structure*/
+.wrapper {
+    display: grid;
+    grid-template-columns: 33% 33% 33%;
+}
+
 
  
 
