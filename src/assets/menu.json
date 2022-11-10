@@ -1,0 +1,23 @@
+
+[
+    {
+        "name" : "M10",
+        "image" : "img/M10.jpg",
+        "cameraType" : "Rangefinder",
+        "mount" : "M mount"
+    }
+    ,
+    {
+        "name" :  "Q2",
+        "image" : "img/Q2.jpg",
+        "cameraType" : "Comapct camera",
+        "mount" : "Fixed lens"
+    }
+    ,
+    {
+        "name" :  "SL2",
+        "image" : "img/SL2.jpg",
+        "cameraType" : "System camera",
+        "mount" : "L mount"
+    }
+]
