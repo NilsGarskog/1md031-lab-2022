@@ -78,6 +78,12 @@ io.on('connection', function (socket) {
     // send updated info to all connected clients, note the use of io instead of socket
     io.emit('currentQueue', { orders: data.getAllOrders() });
   });
+  //DelivertyTime TA BORT SEN
+  socket.on("deliveryTime", function() {
+    console.log("tagit emot delivery")
+    socket.emit("deliveryTimeIs", Object.keys(data.getAllOrders()).length * 5 )
+    console.log("tagit emot delivery")
+  });
 
 });
 

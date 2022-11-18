@@ -10,12 +10,15 @@
     <main>
       <section id="cameras">
         <h2>Cameras</h2>
-        <p></p>
+         <!--
+        <p>Current delivery time is {{deliveryTime}}</p>
+        -->
         <div class="wrapper">
           <Camera
             v-for="camera in cameras"
             v-bind:camera="camera"
             v-bind:key="camera.name"
+            v-on:orderedCamera="addToOrder($event)"
           />
 
           <!--<div class="box a">
@@ -43,6 +46,9 @@
             </ul>
           </div>-->
         </div>
+        <!--
+        <button v-on:click = "checkDeliveryTime">Delivery time</button>
+        -->
       </section>
       <section id="Customer_information">
         <h2>Customer information</h2>
@@ -67,25 +73,6 @@
                 v-model="em"
                 required="required"
                 placeholder="E-mail address"
-              />
-            </p>
-            <p>
-              <label for="Streetname">Street</label><br />
-              <input
-                type="text"
-                id="Streetname"
-                v-model="sn"
-                placeholder="Street name"
-              />
-            </p>
-            <p>
-              <label for="Housenumber">House</label><br />
-              <input
-                type="number"
-                id="Housenumber"
-                v-model="hn"
-                required="required"
-                placeholder="House number"
               />
             </p>
             <p>
@@ -126,12 +113,20 @@
               />
               <label for="Other">Other</label>
             </div>
+             <p>Click on the delivery adress in the map below</p>
+                <div id="fitMap">
+              <div id="map" v-on:click="setLocation" v-bind:style="{ background: 'url(' + require('../../public/img/polacks.jpg')+ ')' }">
+                <div v-bind:style="{ left: location.x + 'px', top: location.y + 'px'}" v-bind:key="'dots' + key">
+             T
+          </div>
+    </div>
+    </div>
           </form>
         </section>
       </section>
     </main>
-    <button type="submit" v-on:click = "printInformation">
-      <img src="img/submit.png" style="width: 80px" />
+    <button class="button-3" role="button" type="submit" v-on:click = "printInformation">
+      {{orderText}}
     </button>
     <hr />
     <footer>&#169; Nils</footer>
@@ -172,28 +167,52 @@ export default {
   },
   data: function () {
     return {
-      cameras: menu, //försökte manuellt omvandla menu men pga det redan var ett java-objekt vid import gav det error?
+      cameras: menu,
       fn: "",
       em: "",
-      sn: "",
-      hn: "",
       pay: "Card",
-      g: ""
+      g: "",
+      orderedCameras: {},
+      deliveryTime: 0,
+      location: { x: 0,
+            y: 0
+          },
+      orderText: "Order"
 
     };
   },
+      created: function () {
+      socket.on('DeliveryTimeIs', time =>
+        this.deliveryTime = time);
+    },
   methods: {
     printInformation: function() {
-        console.log(this.fn, this.em, this.sn, this.hn, this.pay, this.g)
+        this.orderText = "Thank you!"
+        console.log(this.fn, this.em, this.pay, this.g, this.orderedCameras)
+        socket.emit("addOrder", {
+        orderId: this.getOrderNumber(),
+        details: {
+          x: this.location.x,
+          y: this.location.y,
+          name: this.fn,
+          mail: this.em,
+          pay: this.pay,
+          gender: this.g,
+        },
+        orderItems: this.orderedCameras,
+      });
     },
     getOrderNumber: function () {
       return Math.floor(Math.random() * 100000);
     },
+    /*
     addOrder: function (event) {
       var offset = {
         x: event.currentTarget.getBoundingClientRect().left,
         y: event.currentTarget.getBoundingClientRect().top,
       };
+      this.location.x = event.clientX - 10 - offset.x;
+      this.location.y = event.clientY - 10 - offset.y;
       socket.emit("addOrder", {
         orderId: this.getOrderNumber(),
         details: {
@@ -203,6 +222,24 @@ export default {
         orderItems: ["Beans", "Curry"],
       });
     },
+   */
+    addToOrder: function (event) {
+  this.orderedCameras[event.name] = event.amount;
+    },
+
+    checkDeliveryTime: function () {  //TA BORT SEN
+        socket.emit("deliveryTime")
+        console.log("skickat delivery")
+    },
+
+    setLocation: function(event) {
+            var offset = {
+        x: event.currentTarget.getBoundingClientRect().left,
+        y: event.currentTarget.getBoundingClientRect().top,
+      };
+      this.location.x = event.clientX - 10 - offset.x;
+      this.location.y = event.clientY - 10 - offset.y;
+    }
   },
 };
 </script>
@@ -242,14 +279,65 @@ li {
   text-align: left;
 }
 
+
+.button-3 {          /* Knapp utseende hämtat från github via "getcssscan.com" */
+  appearance: none;
+  height: 40px;
+  background-color: #2ea44f;
+  border: 1px solid rgba(27, 31, 35, .15);
+  border-radius: 6px;
+  box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: -apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  padding: 6px 16px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.button-3:focus:not(:focus-visible):not(.focus-visible) {
+  box-shadow: none;
+  outline: none;
+}
+
+.button-3:hover {
+  background-color: #2c974b;
+}
+
+.button-3:focus {
+  box-shadow: rgba(46, 164, 79, .4) 0 0 0 3px;
+  outline: none;
+}
+
+.button-3:disabled {
+  background-color: #94d3a2;
+  border-color: rgba(27, 31, 35, .1);
+  color: rgba(255, 255, 255, .8);
+  cursor: default;
+}
+
+.button-3:active {
+  background-color: #298e46;
+  box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
+}
+
+
 button:hover {
   background-color: green;
   cursor: pointer;
   transition: background-color 0.3s;
-}
-
-button:active {
-  opacity: 0.7;
 }
 
 #headlineIMG {
@@ -276,6 +364,33 @@ button:active {
   display: grid;
   grid-template-columns: 33% 33% 33%;
 }
+
+#map{
+    width: 1920px;
+    height: 1078px;
+    background-color: red;
+    position: relative;
+    background-repeat: no-repeat;
+    cursor: crosshair;
+}
+#fitMap{
+  overflow: scroll;
+  height: 600px;
+  width: 1200px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto; 
+  margin-bottom: 30px;
+}
+  #map div {
+    position: absolute;
+    background: black;
+    color: white;
+    border-radius: 10px;
+    width:20px;
+    height:20px;
+    text-align: center;
+  }
 
 /*empty*/
 </style>
