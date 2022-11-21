@@ -72,6 +72,12 @@ io.on('connection', function (socket) {
     io.emit('currentQueue', { orders: data.getAllOrders() });
   });
 
+  socket.on('changedStatus', function (Status) {
+    // send updated info to all connected clients, note the use of io instead of socket
+    io.emit('currentStatus', Status);
+  });
+
+
   // When a connected client emits an "clearQueue" message
   socket.on('clearQueue', function () {
     data = new Data();

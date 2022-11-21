@@ -50,6 +50,12 @@
         <button v-on:click = "checkDeliveryTime">Delivery time</button>
         -->
       </section>
+      <div v-if="popupTriggers.buttonTrigger">
+      <PopUp v-bind:PopUp="PopUp"
+             v-bind:Receipt="Receipt"
+             v-bind:key="PopUpFonster"
+             v-on:closeCurrentPopup="togglePopup(); ChangeTextOnClose()" />
+      </div>
       <section id="Customer_information">
         <h2>Customer information</h2>
         <section id="contact">
@@ -128,6 +134,9 @@
     <button class="button-3" role="button" type="submit" v-on:click = "printInformation">
       {{orderText}}
     </button>
+    <div v-if=errorText id="errorTextField">
+      <p>Please fill in all the information</p>
+      </div>
     <hr />
     <footer>&#169; Nils</footer>
   </div>
@@ -137,6 +146,8 @@
 import Camera from "../components/OneCamera.vue";
 import menu from "../assets/menu.json";
 import io from "socket.io-client";
+import PopUp from "../components/PopUp.vue"
+import { ref } from 'vue';
 
 const socket = io();
 
@@ -164,6 +175,7 @@ export default {
   name: "HomeView",
   components: {
     Camera,
+    PopUp,
   },
   data: function () {
     return {
@@ -177,20 +189,41 @@ export default {
       location: { x: 0,
             y: 0
           },
-      orderText: "Order"
+      orderText: "Order",
+      orderNumber: 1,
+      Receipt: [],
+      errorText: false,
+
 
     };
+  },
+  setup(){
+    const popupTriggers = ref({
+      buttonTrigger: false
+    })
+    return {
+      popupTriggers
+    }
   },
       created: function () {
       socket.on('DeliveryTimeIs', time =>
         this.deliveryTime = time);
     },
   methods: {
+    togglePopup: function(){
+      this.popupTriggers.buttonTrigger = !this.popupTriggers.buttonTrigger
+    },
+    ChangeTextOnClose: function(){
+      this.orderText = "Order"
+    },
     printInformation: function() {
+        if (this.fn != "" && this.em != "" && this.g!="" && location.x !=0 && location.y !=0){
+        this.errorText=false
+        this.Receipt= [this.fn, this.em, this.pay, this.g, this.orderNumber, this.orderedCameras]
+        this.popupTriggers.buttonTrigger = !this.popupTriggers.buttonTrigger
         this.orderText = "Thank you!"
-        console.log(this.fn, this.em, this.pay, this.g, this.orderedCameras)
         socket.emit("addOrder", {
-        orderId: this.getOrderNumber(),
+        orderId: this.orderNumber,
         details: {
           x: this.location.x,
           y: this.location.y,
@@ -198,10 +231,17 @@ export default {
           mail: this.em,
           pay: this.pay,
           gender: this.g,
+          OrderStatus: this.OrderStatus
         },
         orderItems: this.orderedCameras,
       });
+        this.orderNumber += 1
+        }
+        else{
+          this.errorText = true
+        }
     },
+
     getOrderNumber: function () {
       return Math.floor(Math.random() * 100000);
     },
@@ -251,6 +291,10 @@ body {
   /* Sätta allmänna regler för all text */
   font-family: "Questrial", specimen;
   text-align: center;
+}
+
+#errorTextField {
+  color: red;
 }
 
 #mount {
@@ -385,6 +429,7 @@ button:hover {
   #map div {
     position: absolute;
     background: black;
+    background-image: url("https://cdn-icons-png.flaticon.com/512/684/684908.png");
     color: white;
     border-radius: 10px;
     width:20px;
